@@ -1,33 +1,50 @@
 package bot
 
 import (
-	"gopkg.in/telebot.v3"
+	"log"
 
-	"github.com/KirillMerz/NSCMTelegramBot/env"
+	"gopkg.in/telebot.v3"
 )
 
-func New() (*telebot.Bot, error) {
-    webhook := &telebot.Webhook{
-        Listen: ":" + env.GetFromEnv("WEBHOOK_PORT"),
-        Endpoint: &telebot.WebhookEndpoint{ PublicURL: env.GetFromEnv("WEBHOOK_ENDPOINT_URL") },
-        AllowedUpdates: []string{"message"},
-        TLS: &telebot.WebhookTLS{
-            Key: "data/certs/privkey.pem",
-            Cert: "data/certs/fullchain.pem",
-        },
-    }
+func New(webhookURL, webhookPort, botToken string) *telebot.Bot {
+	return newAPI(webhookURL, webhookPort, botToken)
+}
 
-    botPref := telebot.Settings{
-        Token: env.GetFromEnv("TELEGRAM_BOT_TOKEN"),
-        Poller: webhook,
-    }
+func newAPI(webhookURL, webhookPort, botToken string) *telebot.Bot {
+	bot, err := telebot.NewBot(telebot.Settings{
+		Token:  botToken,
+		Poller: newWebhook(webhookURL, webhookPort, botToken),
+	})
 
-    bot, err := telebot.NewBot(botPref)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-    bot.Handle("/start", start)
+	bot.Handle("/help", help)
+	bot.Handle("/start", start)
+	bot.Handle("/check", check)
+	bot.Handle("/unregister", unregister)
+	bot.Handle(telebot.OnText, otherHandler)
 
-    return bot, nil
+	return bot
+}
+
+func newWebhook(webhookURL, webhookPort, botToken string) *telebot.Webhook {
+	tls := &telebot.WebhookTLS{
+		Key:  "data/certs/privkey.pem",
+		Cert: "data/certs/fullchain.pem",
+	}
+
+	webhookEndpoint := &telebot.WebhookEndpoint{
+		PublicURL: webhookURL,
+	}
+
+	webhook := &telebot.Webhook{
+		Listen:         ":" + webhookPort,
+		Endpoint:       webhookEndpoint,
+		TLS:            tls,
+		AllowedUpdates: []string{"message"},
+	}
+
+	return webhook
 }

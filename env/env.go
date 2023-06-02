@@ -8,19 +8,19 @@ import (
 )
 
 func init() {
-     if err := godotenv.Load(); err != nil {
-         log.Println("ENV: .env was not loaded")
-     } else {
-         log.Println("ENV: .env was loaded")
-     }
+	if err := godotenv.Load(); err != nil {
+		log.Println("ENV: .env was not loaded")
+	} else {
+		log.Println("ENV: .env was loaded")
+	}
 }
 
 func GetFromEnv(key string) string {
-    value, exists := os.LookupEnv(key)
-    
-    if !exists {
-        log.Fatalf("ENV: '%s' was not found\n", key)
-    }
-    
-    return value
+	value, exists := os.LookupEnv(key)
+
+	if !exists {
+		log.Fatalf("ENV: '%s' was not found\n", key)
+	}
+
+	return value
 }
