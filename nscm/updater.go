@@ -93,5 +93,7 @@ func (u *ResultsUpdater) processUser(user models.User) error {
 
 	_, err = u.bot.Send(recipient, GetResultsMessage(results))
 
+	log.Printf("UPDATER: results was updated for {%d}\n", user.ID)
+
 	return err
 }

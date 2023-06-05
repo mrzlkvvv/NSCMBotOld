@@ -130,5 +130,5 @@ func sendResults(ctx telebot.Context, results models.Results) error {
 }
 
 func logCommand(funcName string, start time.Time, sender *telebot.User) {
-	log.Printf("BOT: {%s (%d)} %s (%v)\n", sender.Username, sender.ID, funcName, time.Since(start))
+	log.Printf("BOT: %s {%d} (%v)\n", funcName, sender.ID, time.Since(start))
 }
