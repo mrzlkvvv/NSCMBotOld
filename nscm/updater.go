@@ -15,6 +15,8 @@ import (
 
 const UpdateInterval = 5 * time.Minute
 
+const MESSAGE_RESULTS_WAS_UPDATED = "Ваши результаты были обновлены, секунду..."
+
 type ResultsUpdater struct {
 	db  *database.Database
 	bot *telebot.Bot
@@ -89,6 +91,11 @@ func (u *ResultsUpdater) processUser(user models.User) error {
 
 	recipient := &telebot.User{
 		ID: user.ID,
+	}
+
+	_, err = u.bot.Send(recipient, MESSAGE_RESULTS_WAS_UPDATED)
+	if err != nil {
+		return err
 	}
 
 	_, err = u.bot.Send(recipient, GetResultsMessage(results))
