@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 
-	"github.com/KirillMerz/NSCMTelegramBot/models"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/KirillMerz/NSCMTelegramBot/models"
 )
 
 const DATABASE_NAME = "NSCMTelegramBot"
@@ -44,48 +44,53 @@ func New(uri string) *Database {
 	}
 }
 
-func (db *Database) IsUserRegistered(UserID int64) (bool, error) {
-	var user models.User
-
-	filter := bson.D{{Key: "_id", Value: UserID}}
-	err := db.users.FindOne(context.TODO(), filter).Decode(&user)
-
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return false, nil
-		}
-
-		return false, err
-	}
-
-	return true, nil
-}
-
-func (db *Database) RegisterUser(user models.User) error {
+func (db *Database) RegisterUser(user models.User, results models.Results) error {
 	_, err := db.users.InsertOne(context.TODO(), user)
-	return err
-}
-
-func (db *Database) GetUserByID(UserID int64) (models.User, error) {
-	var user models.User
-
-	filter := bson.D{{Key: "_id", Value: UserID}}
-	err := db.users.FindOne(context.TODO(), filter).Decode(&user)
-
 	if err != nil {
-		return models.User{}, err
+		return err
 	}
 
-	return user, nil
+	_, err = db.results.InsertOne(context.TODO(), results)
+
+	return err
 }
 
 func (db *Database) UnregisterUser(UserID int64) error {
 	filter := bson.D{{Key: "_id", Value: UserID}}
+
 	_, err := db.users.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.results.DeleteOne(context.TODO(), filter)
+
 	return err
 }
 
-func (db *Database) UpdateResults(UserID int64, results models.Results) error {
-	_, err := db.results.UpdateByID(context.TODO(), UserID, results)
+func (db *Database) GetResults(UserID int64) (models.Results, error) {
+	filter := bson.D{{Key: "_id", Value: UserID}}
+
+	var results models.Results
+	err := db.results.FindOne(context.TODO(), filter).Decode(&results)
+
+	return results, err
+}
+
+func (db *Database) ReplaceResults(UserID int64, results models.Results) error {
+	filter := bson.D{{Key: "_id", Value: UserID}}
+	_, err := db.results.ReplaceOne(context.TODO(), filter, results)
 	return err
+}
+
+func (db *Database) GetAllUsers() ([]models.User, error) {
+	cur, err := db.users.Find(context.TODO(), bson.D{})
+	if err != nil {
+		return nil, err
+	}
+
+	var users []models.User
+	err = cur.All(context.TODO(), &users)
+
+	return users, err
 }

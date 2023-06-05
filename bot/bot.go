@@ -7,10 +7,6 @@ import (
 )
 
 func New(webhookURL, webhookPort, botToken string) *telebot.Bot {
-	return newAPI(webhookURL, webhookPort, botToken)
-}
-
-func newAPI(webhookURL, webhookPort, botToken string) *telebot.Bot {
 	bot, err := telebot.NewBot(telebot.Settings{
 		Token:  botToken,
 		Poller: newWebhook(webhookURL, webhookPort, botToken),

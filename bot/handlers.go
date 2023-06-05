@@ -52,26 +52,36 @@ func help(ctx telebot.Context) error {
 func register(ctx telebot.Context) error {
 	words := strings.Split(ctx.Message().Text, " ")
 
-	err := db.RegisterUser(models.User{
+	user := models.User{
 		ID:         ctx.Sender().ID,
 		Lastname:   words[0],
 		Name:       words[1],
 		SecondName: words[2],
 		DocNumber:  words[3],
-	})
+	}
 
+	results, err := nscm.GetResults(user)
+	if err != nil {
+		return err
+	}
+
+	err = db.RegisterUser(user, results)
 	if err != nil {
 		return ctx.Send(MESSAGE_DATABASE_ERROR)
 	}
 
-	return ctx.Send(MESSAGE_REGISTER_SUCCESS)
+	err = ctx.Send(MESSAGE_REGISTER_SUCCESS)
+	if err != nil {
+		return err
+	}
+
+	return sendResults(ctx, results)
 }
 
 func unregister(ctx telebot.Context) error {
 	defer logCommand("/unregister", time.Now(), ctx.Sender())
 
 	err := db.UnregisterUser(ctx.Sender().ID)
-
 	if err != nil {
 		return ctx.Send(MESSAGE_DATABASE_ERROR)
 	}
@@ -82,7 +92,7 @@ func unregister(ctx telebot.Context) error {
 func check(ctx telebot.Context) error {
 	defer logCommand("/check", time.Now(), ctx.Sender())
 
-	user, err := db.GetUserByID(ctx.Sender().ID)
+	results, err := db.GetResults(ctx.Sender().ID)
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -92,13 +102,7 @@ func check(ctx telebot.Context) error {
 		return ctx.Send(MESSAGE_DATABASE_ERROR)
 	}
 
-	results, err := nscm.GetResults(user)
-
-	if err != nil {
-		return ctx.Send(MESSAGE_DATABASE_ERROR)
-	}
-
-	return ctx.Send(results)
+	return sendResults(ctx, results)
 }
 
 func otherHandler(ctx telebot.Context) error {
@@ -115,6 +119,14 @@ func otherHandler(ctx telebot.Context) error {
 	}
 
 	return ctx.Send(MESSAGE_UNKNOWN_COMMAND_ERROR)
+}
+
+func sendResults(ctx telebot.Context, results models.Results) error {
+	if len(results.List) == 0 {
+		return ctx.Send(MESSAGE_RESULTS_NOT_FOUND_ERROR)
+	}
+
+	return ctx.Send(nscm.GetResultsMessage(results))
 }
 
 func logCommand(funcName string, start time.Time, sender *telebot.User) {
