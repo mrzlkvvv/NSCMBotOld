@@ -15,7 +15,7 @@ func New(botToken string) *telebot.Bot {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("BOT: creating error:", err)
 	}
 
 	bot.Handle("/help", help)

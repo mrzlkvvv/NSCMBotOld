@@ -2,6 +2,7 @@ package bot
 
 import (
 	"log"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -10,7 +11,6 @@ import (
 	"gopkg.in/telebot.v3"
 
 	"github.com/KirillMerz/NSCMTelegramBot/database"
-	"github.com/KirillMerz/NSCMTelegramBot/env"
 	"github.com/KirillMerz/NSCMTelegramBot/models"
 	"github.com/KirillMerz/NSCMTelegramBot/nscm"
 )
@@ -18,7 +18,7 @@ import (
 var (
 	REGISTER_DATA_REGEXP = regexp.MustCompile(`^[А-аЯ-я]{2,20}\s[А-аЯ-я]{2,20}\s[А-аЯ-я]{2,20}\s\d{6}$`)
 
-	db = database.New(env.GetFromEnv("MONGODB_URI"))
+	db = database.New(os.Getenv("MONGODB_URI"))
 )
 
 func start(ctx telebot.Context) error {

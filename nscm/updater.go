@@ -3,13 +3,13 @@ package nscm
 import (
 	"fmt"
 	"log"
+	"os"
 	"sync"
 	"time"
 
 	"gopkg.in/telebot.v3"
 
 	"github.com/KirillMerz/NSCMTelegramBot/database"
-	"github.com/KirillMerz/NSCMTelegramBot/env"
 	"github.com/KirillMerz/NSCMTelegramBot/models"
 )
 
@@ -25,7 +25,7 @@ type ResultsUpdater struct {
 
 func New(bot *telebot.Bot) *ResultsUpdater {
 	return &ResultsUpdater{
-		db:  database.New(env.GetFromEnv("MONGODB_URI")),
+		db:  database.New(os.Getenv("MONGODB_URI")),
 		bot: bot,
 		wg:  &sync.WaitGroup{},
 	}
