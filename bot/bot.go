@@ -2,14 +2,16 @@ package bot
 
 import (
 	"log"
+	"os"
+	"time"
 
 	"gopkg.in/telebot.v3"
 )
 
-func New(webhookURL, webhookPort, botToken string) *telebot.Bot {
+func New(botToken string) *telebot.Bot {
 	bot, err := telebot.NewBot(telebot.Settings{
 		Token:  botToken,
-		Poller: newWebhook(webhookURL, webhookPort, botToken),
+		Poller: newPoller(botToken),
 	})
 
 	if err != nil {
@@ -23,6 +25,17 @@ func New(webhookURL, webhookPort, botToken string) *telebot.Bot {
 	bot.Handle(telebot.OnText, otherHandler)
 
 	return bot
+}
+
+func newPoller(botToken string) telebot.Poller {
+	webhookUrl, webhookUrlExists := os.LookupEnv("WEBHOOK_URL")
+	webhookPort, webhookPortExists := os.LookupEnv("WEBHOOK_PORT")
+
+	if webhookUrlExists && webhookPortExists {
+		return newWebhook(webhookUrl, webhookPort, botToken)
+	}
+
+	return newLongPoller()
 }
 
 func newWebhook(webhookURL, webhookPort, botToken string) *telebot.Webhook {
@@ -43,4 +56,11 @@ func newWebhook(webhookURL, webhookPort, botToken string) *telebot.Webhook {
 	}
 
 	return webhook
+}
+
+func newLongPoller() *telebot.LongPoller {
+	return &telebot.LongPoller{
+		Timeout:        10 * time.Second,
+		AllowedUpdates: []string{"message"},
+	}
 }
