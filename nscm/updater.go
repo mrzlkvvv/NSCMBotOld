@@ -80,7 +80,7 @@ func (u *ResultsUpdater) processUser(user models.User) error {
 		return err
 	}
 
-	if len(results.List) == len(oldResults.List) {
+	if len(results.List) <= len(oldResults.List) {
 		return nil
 	}
 
