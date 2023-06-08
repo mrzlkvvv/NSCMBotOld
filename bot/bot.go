@@ -10,8 +10,9 @@ import (
 
 func New(botToken string) *telebot.Bot {
 	bot, err := telebot.NewBot(telebot.Settings{
-		Token:  botToken,
-		Poller: newPoller(botToken),
+		Token:     botToken,
+		Poller:    newPoller(botToken),
+		ParseMode: "Markdown",
 	})
 
 	if err != nil {
