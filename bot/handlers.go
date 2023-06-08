@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	REGISTER_DATA_REGEXP = regexp.MustCompile(`^[А-аЯ-я]{2,20}\s[А-аЯ-я]{2,20}\s[А-аЯ-я]{2,20}\s\d{6}$`)
+	REGISTER_DATA_REGEXP = regexp.MustCompile(`^([А-аЯ-яёЁ]{2,20}\s){2,3}\d{6}$`)
 
 	db = database.New(os.Getenv("MONGODB_URI"))
 )
@@ -53,11 +53,15 @@ func register(ctx telebot.Context) error {
 	words := strings.Split(ctx.Message().Text, " ")
 
 	user := models.User{
-		ID:         ctx.Sender().ID,
-		Lastname:   words[0],
-		Name:       words[1],
-		SecondName: words[2],
-		DocNumber:  words[3],
+		ID:        ctx.Sender().ID,
+		Lastname:  words[0],
+		Name:      words[1],
+		DocNumber: words[len(words)-1],
+	}
+
+	// Set SecondName, if it exists
+	if len(words) == 4 {
+		user.SecondName = words[2]
 	}
 
 	results, err := nscm.GetResults(user)
