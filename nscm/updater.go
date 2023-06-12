@@ -15,7 +15,7 @@ import (
 
 const UpdateInterval = 5 * time.Minute
 
-const MESSAGE_RESULTS_WAS_UPDATED = "Ваши результаты были обновлены, секунду..."
+const MESSAGE_RESULTS_WAS_UPDATED = "Ваши результаты были обновлены\nПосмотрим? (/check)"
 
 type ResultsUpdater struct {
 	db  *database.Database
@@ -94,13 +94,8 @@ func (u *ResultsUpdater) processUser(user models.User) error {
 	}
 
 	_, err = u.bot.Send(recipient, MESSAGE_RESULTS_WAS_UPDATED)
-	if err != nil {
-		return err
-	}
 
-	_, err = u.bot.Send(recipient, GetResultsMessage(results))
-
-	log.Printf("UPDATER: results was updated for {%d}\n", user.ID)
+	log.Printf("UPDATER: results was updated for user {%d}\n", user.ID)
 
 	return err
 }
