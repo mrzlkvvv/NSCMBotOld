@@ -84,18 +84,14 @@ func (u *ResultsUpdater) processUser(user models.User) error {
 		return nil
 	}
 
-	err = u.db.ReplaceResults(user.ID, results)
+	err = u.db.ReplaceResults(results)
 	if err != nil {
 		return err
 	}
 
-	recipient := &telebot.User{
-		ID: user.ID,
-	}
-
-	_, err = u.bot.Send(recipient, MESSAGE_RESULTS_WAS_UPDATED)
-
 	log.Printf("UPDATER: results was updated for user {%d}\n", user.ID)
+
+	_, err = u.bot.Send(&telebot.User{ID: user.ID}, MESSAGE_RESULTS_WAS_UPDATED)
 
 	return err
 }

@@ -44,13 +44,14 @@ func New(uri string) *Database {
 	}
 }
 
-func (db *Database) RegisterUser(user models.User, results models.Results) error {
+func (db *Database) RegisterUser(user models.User) error {
 	_, err := db.users.InsertOne(context.TODO(), user)
 	if err != nil {
 		return err
 	}
 
-	_, err = db.results.InsertOne(context.TODO(), results)
+	emptyResults := models.Results{ID: user.ID}
+	_, err = db.results.InsertOne(context.TODO(), emptyResults)
 
 	return err
 }
@@ -77,8 +78,8 @@ func (db *Database) GetResults(UserID int64) (models.Results, error) {
 	return results, err
 }
 
-func (db *Database) ReplaceResults(UserID int64, results models.Results) error {
-	filter := bson.D{{Key: "_id", Value: UserID}}
+func (db *Database) ReplaceResults(results models.Results) error {
+	filter := bson.D{{Key: "_id", Value: results.ID}}
 	_, err := db.results.ReplaceOne(context.TODO(), filter, results)
 	return err
 }

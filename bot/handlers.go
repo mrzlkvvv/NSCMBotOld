@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	REGISTER_DATA_REGEXP = regexp.MustCompile(`^([А-аЯ-яёЁ]{2,20}\s){2,3}\d{6}$`)
+	REGISTER_DATA_REGEXP = regexp.MustCompile(`^([А-аЯ-яёЁ]{2,20} ){2,3}\d{6}$`)
 
 	db = database.New(os.Getenv("MONGODB_URI"))
 )
@@ -64,12 +64,7 @@ func register(ctx telebot.Context) error {
 		user.SecondName = words[2]
 	}
 
-	results, err := nscm.GetResults(user)
-	if err != nil {
-		return err
-	}
-
-	err = db.RegisterUser(user, results)
+	err := db.RegisterUser(user)
 	if err != nil {
 		return ctx.Send(MESSAGE_DATABASE_ERROR)
 	}
@@ -77,6 +72,16 @@ func register(ctx telebot.Context) error {
 	err = ctx.Send(MESSAGE_REGISTER_SUCCESS)
 	if err != nil {
 		return err
+	}
+
+	results, err := nscm.GetResults(user)
+	if err != nil {
+		return ctx.Send(MESSAGE_NSCM_IS_A_TEAPOT_ERROR)
+	}
+
+	err = db.ReplaceResults(results)
+	if err != nil {
+		return ctx.Send(MESSAGE_DATABASE_ERROR)
 	}
 
 	return sendResults(ctx, results)

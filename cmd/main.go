@@ -14,7 +14,8 @@ func main() {
 		os.Getenv("TELEGRAM_BOT_TOKEN"),
 	)
 
-	go nscm.New(telegramBot).Start()
+	resultsUpdater := nscm.New(telegramBot)
+	go resultsUpdater.Start()
 
 	telegramBot.Start()
 }
