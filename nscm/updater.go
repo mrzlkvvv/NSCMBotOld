@@ -75,12 +75,16 @@ func (u *ResultsUpdater) processUser(user models.User) error {
 		return err
 	}
 
+	if len(results.List) == 0 {
+		return nil
+	}
+
 	oldResults, err := u.db.GetResults(user.ID)
 	if err != nil {
 		return err
 	}
 
-	if len(results.List) <= len(oldResults.List) {
+	if len(results.List) == len(oldResults.List) {
 		return nil
 	}
 
