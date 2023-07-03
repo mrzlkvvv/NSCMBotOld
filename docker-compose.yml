@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+
+  bot:
+    build: .
+    env_file: .env
+    environment:
+      - MONGODB_URI=mongodb://db:27017
+    ports:
+      - ${WEBHOOK_PORT}:${WEBHOOK_PORT}
+    depends_on:
+      - db
+    volumes:
+      - ./data/:/data
+    restart: always
+
+  db:
+    image: mongo
+    volumes:
+      - /var/lib/mongodb/:/data/db
+    restart: always
