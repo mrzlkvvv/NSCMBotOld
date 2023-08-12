@@ -1,7 +1,6 @@
 package nscm
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"sync"
@@ -48,7 +47,7 @@ func (u *ResultsUpdater) Start() {
 
 func (u *ResultsUpdater) processAllUsers(users []models.User) {
 	defer func(numOfUsers int, start time.Time) {
-		log.Println(fmt.Sprintf("UPDATER: results updated for %d users (%v)", numOfUsers, time.Since(start)))
+		log.Printf("UPDATER: results updated for %d users (%v)\n", numOfUsers, time.Since(start))
 	}(len(users), time.Now())
 
 	u.wg.Add(len(users))
@@ -60,7 +59,7 @@ func (u *ResultsUpdater) processAllUsers(users []models.User) {
 
 			err := u.processUser(user)
 			if err != nil {
-				log.Println(fmt.Sprintf("UPDATER: error processing user {%d}: %v", user.ID, err))
+				log.Printf("UPDATER: error processing user {%d}: %v\n", user.ID, err)
 			}
 
 		}(user)
