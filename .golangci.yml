@@ -1,0 +1,7 @@
+linters:
+  enable:
+    - bodyclose # Checks whether HTTP response body is closed successfully.
+    - goimports # Check import statements are formatted according to the 'goimport' command. Reformat imports in autofix mode.
+    - gofmt # Gofmt checks whether code was gofmt-ed. By default this tool runs with -s option to check for code simplification.
+
+allow-parallel-runners: true
