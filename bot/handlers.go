@@ -36,17 +36,17 @@ func start(ctx telebot.Context) error {
 		greeting = "Добрый вечер! "
 	}
 
-	err := ctx.Send(greeting + MESSAGE_START)
+	err := sendMessage(ctx, greeting+MESSAGE_START)
 	if err != nil {
 		return err
 	}
 
-	return ctx.Send(MESSAGE_HELP)
+	return sendMessage(ctx, MESSAGE_HELP)
 }
 
 func help(ctx telebot.Context) error {
 	defer logCommand("/help", time.Now(), ctx.Sender())
-	return ctx.Send(MESSAGE_HELP)
+	return sendMessage(ctx, MESSAGE_HELP)
 }
 
 func register(ctx telebot.Context) error {
@@ -66,22 +66,22 @@ func register(ctx telebot.Context) error {
 
 	err := db.RegisterUser(user)
 	if err != nil {
-		return ctx.Send(MESSAGE_DATABASE_ERROR)
+		return sendMessage(ctx, MESSAGE_DATABASE_ERROR)
 	}
 
-	err = ctx.Send(MESSAGE_REGISTER_SUCCESS)
+	err = sendMessage(ctx, MESSAGE_REGISTER_SUCCESS)
 	if err != nil {
 		return err
 	}
 
 	results, err := nscm.GetResults(user)
 	if err != nil {
-		return ctx.Send(MESSAGE_NSCM_IS_A_TEAPOT_ERROR)
+		return sendMessage(ctx, MESSAGE_NSCM_IS_A_TEAPOT_ERROR)
 	}
 
 	err = db.ReplaceResults(results)
 	if err != nil {
-		return ctx.Send(MESSAGE_DATABASE_ERROR)
+		return sendMessage(ctx, MESSAGE_DATABASE_ERROR)
 	}
 
 	return sendResults(ctx, results)
@@ -92,10 +92,10 @@ func unregister(ctx telebot.Context) error {
 
 	err := db.UnregisterUser(ctx.Sender().ID)
 	if err != nil {
-		return ctx.Send(MESSAGE_DATABASE_ERROR)
+		return sendMessage(ctx, MESSAGE_DATABASE_ERROR)
 	}
 
-	return ctx.Send(MESSAGE_UNREGISTER_SUCCESS)
+	return sendMessage(ctx, MESSAGE_UNREGISTER_SUCCESS)
 }
 
 func check(ctx telebot.Context) error {
@@ -105,10 +105,10 @@ func check(ctx telebot.Context) error {
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return ctx.Send(MESSAGE_NOT_REGISTERED_ERROR)
+			return sendMessage(ctx, MESSAGE_NOT_REGISTERED_ERROR)
 		}
 
-		return ctx.Send(MESSAGE_DATABASE_ERROR)
+		return sendMessage(ctx, MESSAGE_DATABASE_ERROR)
 	}
 
 	return sendResults(ctx, results)
@@ -127,15 +127,28 @@ func otherHandler(ctx telebot.Context) error {
 		return register(ctx)
 	}
 
-	return ctx.Send(MESSAGE_UNKNOWN_COMMAND_ERROR)
+	return sendMessage(ctx, MESSAGE_UNKNOWN_COMMAND_ERROR)
 }
 
 func sendResults(ctx telebot.Context, results models.Results) error {
 	if len(results.List) == 0 {
-		return ctx.Send(MESSAGE_RESULTS_NOT_FOUND_ERROR)
+		return sendMessage(ctx, MESSAGE_RESULTS_NOT_FOUND_ERROR)
 	}
 
-	return ctx.Send(nscm.GetResultsMessage(results))
+	return sendMessage(ctx, nscm.GetResultsMessage(results))
+}
+
+func sendMessage(ctx telebot.Context, message string) error {
+	// send message; if bot was blocked by user, then unregister him
+
+	err := ctx.Send(message)
+
+	if err == telebot.ErrBlockedByUser {
+		err := db.UnregisterUser(ctx.Sender().ID)
+		return err
+	}
+
+	return err
 }
 
 func logCommand(funcName string, start time.Time, sender *telebot.User) {
