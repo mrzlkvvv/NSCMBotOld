@@ -8,8 +8,8 @@ import (
 
 	"gopkg.in/telebot.v3"
 
-	"github.com/KirillMerz/NSCMTelegramBot/database"
-	"github.com/KirillMerz/NSCMTelegramBot/models"
+	"github.com/KirillMerz/NSCMBot/database"
+	"github.com/KirillMerz/NSCMBot/models"
 )
 
 const UpdateInterval = 5 * time.Minute

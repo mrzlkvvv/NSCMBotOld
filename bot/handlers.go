@@ -10,9 +10,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"gopkg.in/telebot.v3"
 
-	"github.com/KirillMerz/NSCMTelegramBot/database"
-	"github.com/KirillMerz/NSCMTelegramBot/models"
-	"github.com/KirillMerz/NSCMTelegramBot/nscm"
+	"github.com/KirillMerz/NSCMBot/database"
+	"github.com/KirillMerz/NSCMBot/models"
+	"github.com/KirillMerz/NSCMBot/nscm"
 )
 
 var (

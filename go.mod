@@ -1,4 +1,4 @@
-module github.com/KirillMerz/NSCMTelegramBot
+module github.com/KirillMerz/NSCMBot
 
 go 1.20
 

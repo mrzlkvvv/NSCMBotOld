@@ -5,8 +5,8 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
-	"github.com/KirillMerz/NSCMTelegramBot/bot"
-	"github.com/KirillMerz/NSCMTelegramBot/nscm"
+	"github.com/KirillMerz/NSCMBot/bot"
+	"github.com/KirillMerz/NSCMBot/nscm"
 )
 
 func main() {

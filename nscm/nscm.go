@@ -10,7 +10,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html"
 
-	"github.com/KirillMerz/NSCMTelegramBot/models"
+	"github.com/KirillMerz/NSCMBot/models"
 )
 
 const NSCM_URL = "http://nscm.ru/giaresult/tablresult.php"

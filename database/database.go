@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/KirillMerz/NSCMTelegramBot/models"
+	"github.com/KirillMerz/NSCMBot/models"
 )
 
 const DATABASE_NAME = "NSCMTelegramBot"
