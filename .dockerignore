@@ -1,12 +1,10 @@
-.env.example
-README.md
+.*
 
-.gitignore
+bin/
+
+README.md
 
 Makefile
 
 Dockerfile
 docker-compose.yml
-.dockerignore
-
-bin/
